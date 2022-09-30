@@ -6,7 +6,6 @@ Place your custom CSS here
 }
 
 .customDropdownList{
-    width: calc(100% - 15px);
     position: absolute;
     background: white;
     border: 1px solid #cccccc;
@@ -14,10 +13,13 @@ Place your custom CSS here
     z-index: 1;
     height: 250px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .customDropdownList > ul{
     list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
 .textBoxInput{
