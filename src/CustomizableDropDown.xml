@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget
+    id="mendix.customizabledropdown.CustomizableDropDown"
+    pluginWidget="true"
+    needsEntityContext="true"
+    offlineCapable="true"
+    supportedPlatform="Web"
+    xmlns="http://www.mendix.com/widget/1.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd"
+>
+    <name>Customizable Drop Down</name>
+    <description>My widget description</description>
+    <icon />
+    <properties>
+        <propertyGroup caption="General">
+            <property key="data" type="datasource" isList="true" required="true">
+                <caption>Data source</caption>
+                <description />
+            </property>
+            <property key="listSize" type="integer" defaultValue="10">
+                <caption>List size</caption>
+                <description />
+            </property>
+            <property key="destinationAttribute" type="attribute" required="true" onChange="onValueChange">
+                <caption>Destination attribute</caption>
+                <description>Attribute to set value to</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="destinationAssociation" type="association" selectableObjects="data" required="false">
+                <caption>Destination association</caption>
+                <description />
+                <associationTypes>
+                    <associationType name="Reference" />
+                </associationTypes>
+            </property>
+            <property key="onValueChange" type="action">
+                <caption>On change</caption>
+                <description>Action to perform when attribute value changes</description>
+            </property>
+            <property key="sourceAttribute" type="attribute" required="false" dataSource="data">
+                <caption>Source attribute</caption>
+                <description>Attribute with value for destination attribute above</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+            <property key="content" type="widgets" required="true" dataSource="data">
+                <caption>Item content</caption>
+                <description />
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Filter">
+            <property key="useFilter" type="boolean" defaultValue="true">
+                <caption>UseFilter</caption>
+                <description>Set to false if using microflow/nanoflow as datasource</description>
+            </property>
+            <property key="filterAttribute" type="attribute" required="false" dataSource="data">
+                <caption>Filter attribute</caption>
+                <description>Attribute to filter on</description>
+                <attributeTypes>
+                    <attributeType name="String" />
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="More">
+            <property key="emptyOnFocus" type="boolean" defaultValue="false">
+                <caption>Empty on focus?</caption>
+                <description />
+            </property>
+            <property key="showClearButton" type="boolean" defaultValue="true">
+                <caption>Show clear button</caption>
+                <description />
+            </property>
+            <property key="clearBtnIcon" type="icon" required="false">
+                <caption>Clear button Icon</caption>
+                <description/>
+            </property>
+        </propertyGroup>
+    </properties>
+</widget>
