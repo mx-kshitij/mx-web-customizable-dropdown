@@ -10,7 +10,7 @@
     xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd"
 >
     <name>Customizable Drop Down</name>
-    <description>My widget description</description>
+    <description>Customizable drop down</description>
     <icon />
     <properties>
         <propertyGroup caption="General">
@@ -51,6 +51,14 @@
                 <caption>Item content</caption>
                 <description />
             </property>
+            <!-- <property key="inputTimeout" type="integer" defaultValue="300">
+                <caption>Input timeout</caption>
+                <description>Timeout before input is accepted for search</description>
+            </property> -->
+            <property key="placeholder" type="textTemplate" required="false">
+                <caption>Placeholder</caption>
+                <description />
+            </property>
         </propertyGroup>
         <propertyGroup caption="Filter">
             <property key="useFilter" type="boolean" defaultValue="true">
@@ -64,6 +72,14 @@
                     <attributeType name="String" />
                 </attributeTypes>
             </property>
+            <property key="filterType" type="enumeration" defaultValue="contains">
+                <caption>Filter type</caption>
+                <description />
+                <enumerationValues>
+                    <enumerationValue key="contains">contains</enumerationValue>
+                    <enumerationValue key="startsWith">starts with</enumerationValue>
+                </enumerationValues>
+            </property>
         </propertyGroup>
         <propertyGroup caption="More">
             <property key="emptyOnFocus" type="boolean" defaultValue="false">
@@ -76,7 +92,7 @@
             </property>
             <property key="clearBtnIcon" type="icon" required="false">
                 <caption>Clear button Icon</caption>
-                <description/>
+                <description />
             </property>
         </propertyGroup>
     </properties>

@@ -11,9 +11,10 @@ Place your custom CSS here
     border: 1px solid #cccccc;
     border-radius: 5px;
     z-index: 1;
-    height: 250px;
-    overflow-y: scroll;
+    max-height: 250px;
+    overflow-y: auto;
     overflow-x: hidden;
+    width: 100%;
 }
 
 .customDropdownList > ul{

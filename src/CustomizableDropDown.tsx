@@ -1,7 +1,7 @@
 import { createElement, useEffect, useState } from "react";
 import { ObjectItem } from 'mendix';
 import { Icon } from 'mendix/components/web/Icon';
-import { attribute, literal, contains } from "mendix/filters/builders";
+import { attribute, literal, contains, startsWith } from "mendix/filters/builders";
 import { CustomizableDropDownContainerProps } from "../typings/CustomizableDropDownProps";
 import "./ui/CustomizableDropDown.css";
 
@@ -23,7 +23,10 @@ export function CustomizableDropDown({
     emptyOnFocus,
     listSize,
     showClearButton,
-    clearBtnIcon
+    clearBtnIcon,
+    placeholder,
+    filterType
+    // inputTimeout
 }: CustomizableDropDownContainerProps) {
 
     if (data.status === "loading") {
@@ -34,6 +37,7 @@ export function CustomizableDropDown({
     const [searchResults, setSearchResults] = useState<ObjectItem[] | undefined>([]);
     const [showResults, setShowResults] = useState<boolean>(false);
     const [showBtnVisible, setShowBtnVisible] = useState<boolean>(false);
+    var setValueTimeout: any;
 
     //@ts-ignore
     if (!window.customDropDownOptions) window.customDropDownOptions = [];
@@ -46,8 +50,14 @@ export function CustomizableDropDown({
     //Function to update dataset and apply filters
     useEffect(() => {
         if (useFilter && filterAttribute != undefined && searchText != undefined && searchText != "") {
-            const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
-            data.setFilter(filterCond);
+            if(filterType === "contains"){
+                const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
+                data.setFilter(filterCond);
+            }
+            else if(filterType === "startsWith"){
+                const filterCond = startsWith(attribute(filterAttribute.id), literal(searchText))
+                data.setFilter(filterCond);
+            }
         }
         data.setLimit(listSize);
         setSearchResults(data.items);
@@ -112,15 +122,22 @@ export function CustomizableDropDown({
 
     //function to run on change of text in input textbox
     const updateData = (element: any) => {
+        if(setValueTimeout) clearTimeout(setValueTimeout);
         var value: string = element.target.value;
         setSearchText(value);
-        if (value.trim() != "") {
-            setShowResults(true);
-            setShowBtnVisible(true);
-        }
-        else {
-            setShowBtnVisible(false);
-        }
+
+        // const setValue = () => {
+            if (value.trim() != "") {
+                setShowResults(true);
+                setShowBtnVisible(true);
+            }
+            else {
+                setShowBtnVisible(false);
+            }
+            clearTimeout(setValueTimeout);
+        // }
+
+        // setValueTimeout = setTimeout(setValue, inputTimeout);
     }
 
     //function to run on focus
@@ -135,6 +152,7 @@ export function CustomizableDropDown({
         setShowResults(false);
     }
 
+    // Function to render the clear button
     const renderClearButton = () => {
         if (showBtnVisible) {
             return (
@@ -147,28 +165,28 @@ export function CustomizableDropDown({
         }
     }
 
-    //function to render the textbox
-    const renderTextBox = () => {
-        if (!showClearButton) {
-            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} />)
-        }
-        else {
-            return (
-                <div>
-                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} />
-                    {/* <img src={clearBtnIcon?.value} className="textBoxClearBtn" onClick={clearInput} /> */}
-                    {renderClearButton()}
-                </div>)
-        }
-
-    }
-
+    // Function to clear the textbox on click of clear button
     const clearInput = () => {
         setSearchText("");
         setShowResults(false);
         setShowBtnVisible(false);
         if (destinationAttribute) destinationAttribute.setValue("");
         if (destinationAssociation) destinationAssociation.setValue(undefined);
+    }
+
+    //function to render the textbox
+    const renderTextBox = () => {
+        if (!showClearButton) {
+            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} />)
+        }
+        else {
+            return (
+                <div>
+                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} />
+                    {renderClearButton()}
+                </div>)
+        }
+
     }
 
     //main return function

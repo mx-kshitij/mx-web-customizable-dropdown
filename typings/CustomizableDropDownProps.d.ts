@@ -6,6 +6,8 @@
 import { ComponentType, CSSProperties } from "react";
 import { DynamicValue, EditableValue, ListValue, ListAttributeValue, ListWidgetValue, ReferenceValue, WebIcon } from "mendix";
 
+export type FilterTypeEnum = "contains" | "startsWith";
+
 export interface CustomizableDropDownContainerProps {
     name: string;
     class: string;
@@ -17,8 +19,10 @@ export interface CustomizableDropDownContainerProps {
     destinationAssociation?: ReferenceValue;
     sourceAttribute?: ListAttributeValue<string>;
     content: ListWidgetValue;
+    placeholder?: DynamicValue<string>;
     useFilter: boolean;
     filterAttribute?: ListAttributeValue<string>;
+    filterType: FilterTypeEnum;
     emptyOnFocus: boolean;
     showClearButton: boolean;
     clearBtnIcon?: DynamicValue<WebIcon>;
@@ -36,8 +40,10 @@ export interface CustomizableDropDownPreviewProps {
     onValueChange: {} | null;
     sourceAttribute: string;
     content: { widgetCount: number; renderer: ComponentType<{ caption?: string }> };
+    placeholder: string;
     useFilter: boolean;
     filterAttribute: string;
+    filterType: FilterTypeEnum;
     emptyOnFocus: boolean;
     showClearButton: boolean;
     clearBtnIcon: { type: "glyph"; iconClass: string; } | { type: "image"; imageUrl: string; } | null;
