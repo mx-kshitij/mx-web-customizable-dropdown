@@ -51,10 +51,10 @@
                 <caption>Item content</caption>
                 <description />
             </property>
-            <!-- <property key="inputTimeout" type="integer" defaultValue="300">
+            <property key="inputTimeout" type="integer" defaultValue="300">
                 <caption>Input timeout</caption>
                 <description>Timeout before input is accepted for search</description>
-            </property> -->
+            </property>
             <property key="placeholder" type="textTemplate" required="false">
                 <caption>Placeholder</caption>
                 <description />

@@ -25,8 +25,8 @@ export function CustomizableDropDown({
     showClearButton,
     clearBtnIcon,
     placeholder,
-    filterType
-    // inputTimeout
+    filterType,
+    inputTimeout
 }: CustomizableDropDownContainerProps) {
 
     if (data.status === "loading") {
@@ -37,7 +37,8 @@ export function CustomizableDropDown({
     const [searchResults, setSearchResults] = useState<ObjectItem[] | undefined>([]);
     const [showResults, setShowResults] = useState<boolean>(false);
     const [showBtnVisible, setShowBtnVisible] = useState<boolean>(false);
-    var setValueTimeout: any;
+    const [timeoutId, setTimeoutId] = useState<any>(null);
+    const [focusedListItem, setFocusedListItem] = useState<HTMLElement | Element | null | undefined>();
 
     //@ts-ignore
     if (!window.customDropDownOptions) window.customDropDownOptions = [];
@@ -47,20 +48,30 @@ export function CustomizableDropDown({
         setSearchText(destinationAttribute.displayValue);
     }, [destinationAttribute])
 
-    //Function to update dataset and apply filters
-    useEffect(() => {
+    //Function to apply filters
+    const applyFilters = () => {
         if (useFilter && filterAttribute != undefined && searchText != undefined && searchText != "") {
-            if(filterType === "contains"){
+            if (filterType === "contains") {
                 const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
                 data.setFilter(filterCond);
             }
-            else if(filterType === "startsWith"){
+            else if (filterType === "startsWith") {
                 const filterCond = startsWith(attribute(filterAttribute.id), literal(searchText))
                 data.setFilter(filterCond);
             }
         }
         data.setLimit(listSize);
         setSearchResults(data.items);
+    }
+
+    //Function to update dataset and apply filters
+    useEffect(() => {
+        //Clear previous timeout
+        if (timeoutId) clearTimeout(timeoutId);
+
+        //Set new timeout
+        var id = setTimeout(applyFilters, inputTimeout);
+        setTimeoutId(id);
     }, [data, searchText])
 
     //Function to detect click outside the widget
@@ -86,24 +97,95 @@ export function CustomizableDropDown({
             <div id={"customListNode" + name} className="customDropdownList">
                 <ul>
                     {searchResults.map((item: ObjectItem, index: number) => {
-                        if (item && index) {
-                            return (<li key={index} id={`$content-li$${index}`} className="listItem" onClick={selectItem} data-index={index}>
-                                <div key={index} id={`$content-div$${index}`}>
-                                    {content?.get(item)}
-                                </div>
-                            </li>)
-                        }
+                        return (<li key={index} id={`content-li${index}`} className="listItem" onClick={selectItem} onMouseOver={runOnOptionFocus} data-index={index}>
+                            <div key={index} id={`content-div${index}`}>
+                                {content?.get(item)}
+                            </div>
+                        </li>)
                     })}
                 </ul>
             </div>
         )
     }
 
-    //function to run on selecting a value
+    // Function to run when mouse over a list item
+    const runOnOptionFocus = (event: any) => {
+        var currentFocusElements = document.getElementsByClassName("listItemFocused");
+        for(var i = 0; i < currentFocusElements.length; i++) currentFocusElements[i].classList.remove("listItemFocused");
+        
+        var item = event.target.closest(".listItem");
+        item.classList.add("listItemFocused");
+        setFocusedListItem(item);
+    }
+
+    // Function to run when up/down/tab/enter key is pressed
+    const onKeyDown = (event: any) => {
+        switch (event.keyCode) {
+            case 38:
+                //when up key is pressed
+                var prevItem: HTMLElement | Element | null | undefined;
+                if (focusedListItem) {
+                    focusedListItem.classList.remove("listItemFocused");
+                    prevItem = focusedListItem.previousElementSibling;
+                    
+                }
+                else {
+                    var firstItem: HTMLElement | null;
+                    firstItem = document.getElementById("content-li0");
+                    prevItem = firstItem?.parentElement?.lastElementChild;
+                }
+                if (prevItem) {
+                    prevItem.classList.add("listItemFocused");
+                    prevItem.scrollIntoView();
+                    setFocusedListItem(prevItem);
+                }
+                else{
+                    setFocusedListItem(null);
+                }
+                break;
+            case 40:
+                //when down key is pressed
+                var nextItem: Element | null | undefined;
+                if (focusedListItem) {
+                    focusedListItem.classList.remove("listItemFocused");
+                    nextItem = focusedListItem.nextElementSibling;
+                }
+                else {
+                    nextItem = document.getElementById("content-li0");
+                }
+                if (nextItem) {
+                    nextItem.classList.add("listItemFocused");
+                    nextItem.scrollIntoView();
+                    setFocusedListItem(nextItem);
+                }
+                else{
+                    setFocusedListItem(null);
+                }
+                break;
+            case 9:
+                    //when TAB is pressed
+                    if (focusedListItem) {
+                        setSelectedItem(focusedListItem);
+                    }
+                    break;
+            case 13:
+                //when ENTER is pressed
+                if (focusedListItem) {
+                    setSelectedItem(focusedListItem);
+                }
+                break;
+        }
+    }
+
+    //Function to run on selecting a list item
     const selectItem = (item: any) => {
         //Get the list item for the option
         var listItem = item.target.closest(".listItem");
+        setSelectedItem(listItem);
+    }
 
+    //Function to run to select a specific item
+    const setSelectedItem = (listItem: any) => {
         //Get the item index
         var itemIndex = listItem.getAttribute('data-index');
 
@@ -111,7 +193,11 @@ export function CustomizableDropDown({
         var selectedItem = searchResults?.at(itemIndex);
 
         //Set the textbox value
-        if (selectedItem && sourceAttribute && destinationAttribute) destinationAttribute.setValue(sourceAttribute.get(selectedItem).displayValue);
+        if (selectedItem && sourceAttribute && destinationAttribute) {
+            var finalValue = sourceAttribute.get(selectedItem).displayValue;
+            destinationAttribute.setValue(finalValue);
+            setSearchText(finalValue);
+        }
 
         //Set the association if any
         if (destinationAssociation && selectedItem) destinationAssociation.setValue(selectedItem);
@@ -122,22 +208,15 @@ export function CustomizableDropDown({
 
     //function to run on change of text in input textbox
     const updateData = (element: any) => {
-        if(setValueTimeout) clearTimeout(setValueTimeout);
         var value: string = element.target.value;
         setSearchText(value);
-
-        // const setValue = () => {
-            if (value.trim() != "") {
-                setShowResults(true);
-                setShowBtnVisible(true);
-            }
-            else {
-                setShowBtnVisible(false);
-            }
-            clearTimeout(setValueTimeout);
-        // }
-
-        // setValueTimeout = setTimeout(setValue, inputTimeout);
+        if (value.trim() != "") {
+            setShowResults(true);
+            setShowBtnVisible(true);
+        }
+        else {
+            setShowBtnVisible(false);
+        }
     }
 
     //function to run on focus
@@ -177,12 +256,12 @@ export function CustomizableDropDown({
     //function to render the textbox
     const renderTextBox = () => {
         if (!showClearButton) {
-            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} />)
+            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} />)
         }
         else {
             return (
                 <div>
-                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} />
+                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} />
                     {renderClearButton()}
                 </div>)
         }

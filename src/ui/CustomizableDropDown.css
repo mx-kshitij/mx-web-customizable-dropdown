@@ -5,6 +5,10 @@ Place your custom CSS here
     width: 100%;
 }
 
+.listItemFocused{
+    border: 1px solid grey;
+}
+
 .customDropdownList{
     position: absolute;
     background: white;
@@ -14,7 +18,7 @@ Place your custom CSS here
     max-height: 250px;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 100%;
+    width: calc(100% - 15px);
 }
 
 .customDropdownList > ul{

@@ -19,6 +19,7 @@ export interface CustomizableDropDownContainerProps {
     destinationAssociation?: ReferenceValue;
     sourceAttribute?: ListAttributeValue<string>;
     content: ListWidgetValue;
+    inputTimeout: number;
     placeholder?: DynamicValue<string>;
     useFilter: boolean;
     filterAttribute?: ListAttributeValue<string>;
@@ -40,6 +41,7 @@ export interface CustomizableDropDownPreviewProps {
     onValueChange: {} | null;
     sourceAttribute: string;
     content: { widgetCount: number; renderer: ComponentType<{ caption?: string }> };
+    inputTimeout: number | null;
     placeholder: string;
     useFilter: boolean;
     filterAttribute: string;

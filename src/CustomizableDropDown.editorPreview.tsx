@@ -1,5 +1,4 @@
 import { Component, ReactNode} from "react";
-// import { HelloWorldSample } from "./components/HelloWorldSample";
 import { CustomizableDropDownPreviewProps } from "../typings/CustomizableDropDownProps";
 
 declare function require(name: string): string;
