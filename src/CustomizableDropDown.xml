@@ -22,7 +22,7 @@
                 <caption>List size</caption>
                 <description />
             </property>
-            <property key="destinationAttribute" type="attribute" required="true" onChange="onValueChange">
+            <property key="destinationAttribute" type="attribute" required="true">
                 <caption>Destination attribute</caption>
                 <description>Attribute to set value to</description>
                 <attributeTypes>
@@ -93,6 +93,14 @@
             <property key="clearBtnIcon" type="icon" required="false">
                 <caption>Clear button Icon</caption>
                 <description />
+            </property>
+            <property key="autoComplete" type="enumeration" defaultValue="on">
+                <caption>Filter type</caption>
+                <description />
+                <enumerationValues>
+                    <enumerationValue key="on">on</enumerationValue>
+                    <enumerationValue key="off">off</enumerationValue>
+                </enumerationValues>
             </property>
         </propertyGroup>
     </properties>

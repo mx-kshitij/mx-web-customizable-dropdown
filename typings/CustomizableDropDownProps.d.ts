@@ -4,9 +4,11 @@
  * @author Mendix UI Content Team
  */
 import { ComponentType, CSSProperties } from "react";
-import { DynamicValue, EditableValue, ListValue, ListAttributeValue, ListWidgetValue, ReferenceValue, WebIcon } from "mendix";
+import { ActionValue, DynamicValue, EditableValue, ListValue, ListAttributeValue, ListWidgetValue, ReferenceValue, WebIcon } from "mendix";
 
 export type FilterTypeEnum = "contains" | "startsWith";
+
+export type AutoCompleteEnum = "on" | "off";
 
 export interface CustomizableDropDownContainerProps {
     name: string;
@@ -17,6 +19,7 @@ export interface CustomizableDropDownContainerProps {
     listSize: number;
     destinationAttribute: EditableValue<string>;
     destinationAssociation?: ReferenceValue;
+    onValueChange?: ActionValue;
     sourceAttribute?: ListAttributeValue<string>;
     content: ListWidgetValue;
     inputTimeout: number;
@@ -27,6 +30,7 @@ export interface CustomizableDropDownContainerProps {
     emptyOnFocus: boolean;
     showClearButton: boolean;
     clearBtnIcon?: DynamicValue<WebIcon>;
+    autoComplete: AutoCompleteEnum;
 }
 
 export interface CustomizableDropDownPreviewProps {
@@ -49,4 +53,5 @@ export interface CustomizableDropDownPreviewProps {
     emptyOnFocus: boolean;
     showClearButton: boolean;
     clearBtnIcon: { type: "glyph"; iconClass: string; } | { type: "image"; imageUrl: string; } | null;
+    autoComplete: AutoCompleteEnum;
 }

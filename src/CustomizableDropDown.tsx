@@ -1,7 +1,7 @@
 import { createElement, useEffect, useState } from "react";
 import { ObjectItem } from 'mendix';
 import { Icon } from 'mendix/components/web/Icon';
-import { attribute, literal, contains, startsWith } from "mendix/filters/builders";
+import { attribute, literal, contains, startsWith} from "mendix/filters/builders";
 import { CustomizableDropDownContainerProps } from "../typings/CustomizableDropDownProps";
 import "./ui/CustomizableDropDown.css";
 
@@ -17,16 +17,18 @@ export function CustomizableDropDown({
     destinationAssociation,
     data,
     content,
+    onValueChange,
     useFilter,
     filterAttribute,
+    filterType,
     sourceAttribute,
     emptyOnFocus,
     listSize,
     showClearButton,
     clearBtnIcon,
     placeholder,
-    filterType,
-    inputTimeout
+    inputTimeout,
+    autoComplete
 }: CustomizableDropDownContainerProps) {
 
     if (data.status === "loading") {
@@ -50,6 +52,7 @@ export function CustomizableDropDown({
 
     //Function to apply filters
     const applyFilters = () => {
+        destinationAttribute.setValue(searchText);
         if (useFilter && filterAttribute != undefined && searchText != undefined && searchText != "") {
             if (filterType === "contains") {
                 const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
@@ -110,9 +113,13 @@ export function CustomizableDropDown({
 
     // Function to run when mouse over a list item
     const runOnOptionFocus = (event: any) => {
+        //Get currently focused element(s)
         var currentFocusElements = document.getElementsByClassName("listItemFocused");
-        for(var i = 0; i < currentFocusElements.length; i++) currentFocusElements[i].classList.remove("listItemFocused");
         
+        //Remove styling class to show focus
+        for (var i = 0; i < currentFocusElements.length; i++) currentFocusElements[i].classList.remove("listItemFocused");
+
+        //Set styling class on new item 
         var item = event.target.closest(".listItem");
         item.classList.add("listItemFocused");
         setFocusedListItem(item);
@@ -122,12 +129,11 @@ export function CustomizableDropDown({
     const onKeyDown = (event: any) => {
         switch (event.keyCode) {
             case 38:
-                //when up key is pressed
+                //when up key is pressed, get previous element and focus
                 var prevItem: HTMLElement | Element | null | undefined;
                 if (focusedListItem) {
                     focusedListItem.classList.remove("listItemFocused");
                     prevItem = focusedListItem.previousElementSibling;
-                    
                 }
                 else {
                     var firstItem: HTMLElement | null;
@@ -139,12 +145,12 @@ export function CustomizableDropDown({
                     prevItem.scrollIntoView();
                     setFocusedListItem(prevItem);
                 }
-                else{
+                else {
                     setFocusedListItem(null);
                 }
                 break;
             case 40:
-                //when down key is pressed
+                //when down key is pressed, get next element and focus
                 var nextItem: Element | null | undefined;
                 if (focusedListItem) {
                     focusedListItem.classList.remove("listItemFocused");
@@ -158,16 +164,16 @@ export function CustomizableDropDown({
                     nextItem.scrollIntoView();
                     setFocusedListItem(nextItem);
                 }
-                else{
+                else {
                     setFocusedListItem(null);
                 }
                 break;
             case 9:
-                    //when TAB is pressed
-                    if (focusedListItem) {
-                        setSelectedItem(focusedListItem);
-                    }
-                    break;
+                //when TAB is pressed
+                if (focusedListItem) {
+                    setSelectedItem(focusedListItem);
+                }
+                break;
             case 13:
                 //when ENTER is pressed
                 if (focusedListItem) {
@@ -202,14 +208,23 @@ export function CustomizableDropDown({
         //Set the association if any
         if (destinationAssociation && selectedItem) destinationAssociation.setValue(selectedItem);
 
+        //Execute on value change
+        if(onValueChange && onValueChange.canExecute && !onValueChange.isExecuting) onValueChange.execute();
+
         setShowResults(false);
         setShowBtnVisible(false);
+        setFocusedListItem(null);
     }
 
     //function to run on change of text in input textbox
     const updateData = (element: any) => {
+        //Get the value from input field
         var value: string = element.target.value;
+
+        //Update state with value
         setSearchText(value);
+
+        //Show results
         if (value.trim() != "") {
             setShowResults(true);
             setShowBtnVisible(true);
@@ -246,6 +261,7 @@ export function CustomizableDropDown({
 
     // Function to clear the textbox on click of clear button
     const clearInput = () => {
+        //Clear search text, results, attribute and association.
         setSearchText("");
         setShowResults(false);
         setShowBtnVisible(false);
@@ -256,12 +272,12 @@ export function CustomizableDropDown({
     //function to render the textbox
     const renderTextBox = () => {
         if (!showClearButton) {
-            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} />)
+            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete}/>)
         }
         else {
             return (
                 <div>
-                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} />
+                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete}/>
                     {renderClearButton()}
                 </div>)
         }
