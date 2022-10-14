@@ -31,7 +31,7 @@ export function CustomizableDropDown({
     autoComplete
 }: CustomizableDropDownContainerProps) {
 
-    if (data.status === "loading") {
+    if (destinationAttribute.status === "loading") {
         return (<div />);
     }
 
