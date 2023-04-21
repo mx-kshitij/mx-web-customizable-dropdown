@@ -102,6 +102,14 @@
                     <enumerationValue key="off">off</enumerationValue>
                 </enumerationValues>
             </property>
+            <property key="showDropdownOnEnter" type="boolean" defaultValue="false">
+                <caption>Show dropdown on enter</caption>
+                <description />
+            </property>
+            <property key="noResultPlaceholder" type="string" defaultValue="No results found">
+                <caption>No results placeholder</caption>
+                <description/>
+            </property>
         </propertyGroup>
     </properties>
 </widget>

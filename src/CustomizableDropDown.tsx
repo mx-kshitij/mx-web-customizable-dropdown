@@ -1,7 +1,7 @@
 import { createElement, useEffect, useState } from "react";
 import { ObjectItem } from 'mendix';
 import { Icon } from 'mendix/components/web/Icon';
-import { attribute, literal, contains, startsWith} from "mendix/filters/builders";
+import { attribute, literal, contains, startsWith } from "mendix/filters/builders";
 import { CustomizableDropDownContainerProps } from "../typings/CustomizableDropDownProps";
 import "./ui/CustomizableDropDown.css";
 
@@ -28,7 +28,9 @@ export function CustomizableDropDown({
     clearBtnIcon,
     placeholder,
     inputTimeout,
-    autoComplete
+    autoComplete,
+    showDropdownOnEnter,
+    noResultPlaceholder
 }: CustomizableDropDownContainerProps) {
 
     if (destinationAttribute.status === "loading") {
@@ -91,31 +93,43 @@ export function CustomizableDropDown({
     //Function to render the list
     const renderList = () => {
         //check if any search results
-        if (searchResults === null || searchResults === undefined || searchResults.length === 0 || searchText.trim() === "" || !(showResults)) {
-            return null;
+        if (!(showResults)) {
+            return (<div />);
+        }
+
+        if ((searchResults === null || searchResults === undefined || searchResults.length === 0 || searchText.trim() === "") && showResults) {
+            return (
+                <div id={"customListNode" + name} className="customDropdownList">
+                    <div className="noResults">
+                        <span>{noResultPlaceholder}</span>
+                    </div>
+                </div>
+            )
         }
 
         //return the list of results
-        return (
-            <div id={"customListNode" + name} className="customDropdownList">
-                <ul>
-                    {searchResults.map((item: ObjectItem, index: number) => {
-                        return (<li key={index} id={`content-li${index}`} className="listItem" onClick={selectItem} onMouseOver={runOnOptionFocus} data-index={index}>
-                            <div key={index} id={`content-div${index}`}>
-                                {content?.get(item)}
-                            </div>
-                        </li>)
-                    })}
-                </ul>
-            </div>
-        )
+        if (showResults && searchResults != undefined && searchResults.length > 0) {
+            return (
+                <div id={"customListNode" + name} className="customDropdownList">
+                    <ul>
+                        {searchResults.map((item: ObjectItem, index: number) => {
+                            return (<li key={index} id={`content-li${index}`} className="listItem" onClick={selectItem} onMouseOver={runOnOptionFocus} data-index={index}>
+                                <div key={index} id={`content-div${index}`}>
+                                    {content?.get(item)}
+                                </div>
+                            </li>)
+                        })}
+                    </ul>
+                </div>
+            )
+        }
     }
 
     // Function to run when mouse over a list item
     const runOnOptionFocus = (event: any) => {
         //Get currently focused element(s)
         var currentFocusElements = document.getElementsByClassName("listItemFocused");
-        
+
         //Remove styling class to show focus
         for (var i = 0; i < currentFocusElements.length; i++) currentFocusElements[i].classList.remove("listItemFocused");
 
@@ -209,7 +223,7 @@ export function CustomizableDropDown({
         if (destinationAssociation && selectedItem) destinationAssociation.setValue(selectedItem);
 
         //Execute on value change
-        if(onValueChange && onValueChange.canExecute && !onValueChange.isExecuting) onValueChange.execute();
+        if (onValueChange && onValueChange.canExecute && !onValueChange.isExecuting) onValueChange.execute();
 
         setShowResults(false);
         setShowBtnVisible(false);
@@ -243,7 +257,8 @@ export function CustomizableDropDown({
             element.target.select();
             searchText.trim() != "" ? setShowBtnVisible(true) : setShowBtnVisible(false);
         }
-        setShowResults(false);
+        // setShowResults(false);
+        showDropdownOnEnter ? setShowResults(true) : setShowResults(false);
     }
 
     // Function to render the clear button
@@ -272,12 +287,12 @@ export function CustomizableDropDown({
     //function to render the textbox
     const renderTextBox = () => {
         if (!showClearButton) {
-            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete}/>)
+            return (<input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete} />)
         }
         else {
             return (
                 <div>
-                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete}/>
+                    <input type="text" id={"customDropDownSearch" + name} className="textBoxInput" onInput={updateData} onFocus={runOnFocus} value={searchText} placeholder={placeholder?.value} onKeyDown={onKeyDown} autoComplete={autoComplete} />
                     {renderClearButton()}
                 </div>)
         }

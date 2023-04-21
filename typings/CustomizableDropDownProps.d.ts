@@ -31,6 +31,8 @@ export interface CustomizableDropDownContainerProps {
     showClearButton: boolean;
     clearBtnIcon?: DynamicValue<WebIcon>;
     autoComplete: AutoCompleteEnum;
+    showDropdownOnEnter: boolean;
+    noResultPlaceholder: string;
 }
 
 export interface CustomizableDropDownPreviewProps {
@@ -54,4 +56,6 @@ export interface CustomizableDropDownPreviewProps {
     showClearButton: boolean;
     clearBtnIcon: { type: "glyph"; iconClass: string; } | { type: "image"; imageUrl: string; } | null;
     autoComplete: AutoCompleteEnum;
+    showDropdownOnEnter: boolean;
+    noResultPlaceholder: string;
 }
