@@ -106,6 +106,10 @@
                 <caption>Show dropdown on enter</caption>
                 <description />
             </property>
+            <property key="showUnfilteredOnEnter" type="boolean" defaultValue="false">
+                <caption>Show unfiltered on enter</caption>
+                <description />
+            </property>
             <property key="noResultPlaceholder" type="string" defaultValue="No results found">
                 <caption>No results placeholder</caption>
                 <description/>

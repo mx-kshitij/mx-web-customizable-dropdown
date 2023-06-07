@@ -30,6 +30,7 @@ export function CustomizableDropDown({
     inputTimeout,
     autoComplete,
     showDropdownOnEnter,
+    showUnfilteredOnEnter,
     noResultPlaceholder
 }: CustomizableDropDownContainerProps) {
 
@@ -54,19 +55,27 @@ export function CustomizableDropDown({
 
     //Function to apply filters
     const applyFilters = () => {
-        destinationAttribute.setValue(searchText);
-        if (useFilter && filterAttribute != undefined && searchText != undefined && searchText != "") {
-            if (filterType === "contains") {
-                const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
-                data.setFilter(filterCond);
-            }
-            else if (filterType === "startsWith") {
-                const filterCond = startsWith(attribute(filterAttribute.id), literal(searchText))
-                data.setFilter(filterCond);
-            }
+
+        if (showUnfilteredOnEnter && (searchText === "" || searchText === undefined)) {
+            data.setLimit(listSize);
+            data.setFilter(undefined);
+            setSearchResults(data.items);
         }
-        data.setLimit(listSize);
-        setSearchResults(data.items);
+        else {
+            destinationAttribute.setValue(searchText);
+            if (useFilter && filterAttribute != undefined && searchText != undefined && searchText != "") {
+                if (filterType === "contains") {
+                    const filterCond = contains(attribute(filterAttribute.id), literal(searchText))
+                    data.setFilter(filterCond);
+                }
+                else if (filterType === "startsWith") {
+                    const filterCond = startsWith(attribute(filterAttribute.id), literal(searchText))
+                    data.setFilter(filterCond);
+                }
+            }
+            data.setLimit(listSize);
+            setSearchResults(data.items);
+        }
     }
 
     //Function to update dataset and apply filters
@@ -79,8 +88,9 @@ export function CustomizableDropDown({
         setTimeoutId(id);
     }, [data, searchText])
 
-    //Function to detect click outside the widget
     useEffect(() => {
+
+        //Function to detect click outside the widget
         document.addEventListener('mouseup', function (e: any) {
             var outer = document.getElementById(name + "wrapper");
             if (!(outer?.contains(e.target))) {
@@ -97,7 +107,7 @@ export function CustomizableDropDown({
             return (<div />);
         }
 
-        if ((searchResults === null || searchResults === undefined || searchResults.length === 0 || searchText.trim() === "") && showResults) {
+        if ((searchResults === null || searchResults === undefined || searchResults.length === 0 || ( !showUnfilteredOnEnter && searchText.trim() === "")) && showResults) {
             return (
                 <div id={"customListNode" + name} className="customDropdownList">
                     <div className="noResults">
